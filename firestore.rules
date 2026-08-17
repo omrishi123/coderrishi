@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global safety net - default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isUserEmail(email) {
+      return isSignedIn() && request.auth.token.email == email;
+    }
+
+    // Admin check - checks if the user document has role == "admin", 
+    // or falls back to the bootstrapped developer email from runtime.
+    function isAdmin() {
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin") ||
+        (isEmailVerified() && request.auth.token.email == "omrishi2580@gmail.com")
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Schema validators
+    function isValidProject(project) {
+      return project.title is string && project.title.size() <= 100 &&
+             project.description is string && project.description.size() <= 1000 &&
+             project.techStack is list && project.techStack.size() <= 20 &&
+             project.imageUrl is string && project.imageUrl.size() <= 1048576 &&
+             (!('githubLink' in project) || (project.githubLink is string && project.githubLink.size() <= 500)) &&
+             (!('liveLink' in project) || (project.liveLink is string && project.liveLink.size() <= 500));
+    }
+
+    function isValidSkill(skill) {
+      return skill.name is string && skill.name.size() <= 50 &&
+             skill.category is string && skill.category.size() <= 50 &&
+             (skill.proficiency is int || skill.proficiency is float) &&
+             skill.proficiency >= 0 && skill.proficiency <= 100;
+    }
+
+    function isValidInquiry(inquiry) {
+      return inquiry.name is string && inquiry.name.size() <= 100 &&
+             inquiry.email is string && inquiry.email.size() <= 100 &&
+             inquiry.message is string && inquiry.message.size() <= 2000 &&
+             inquiry.timestamp is string;
+    }
+
+    function isValidUser(user) {
+      return user.email is string && user.email.size() <= 100 &&
+             user.role is string && user.role.size() <= 20;
+    }
+
+    // Collection rules
+    match /projects/{projectId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin() && isValidId(projectId) && isValidProject(request.resource.data);
+    }
+
+    match /skills/{skillId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin() && isValidId(skillId) && isValidSkill(request.resource.data);
+    }
+
+    match /inquiries/{inquiryId} {
+      // Inquiries can only be listed/read by Admins
+      allow read: if isAdmin();
+      // Public contact form submission - requires static validation
+      allow create: if isValidId(inquiryId) && isValidInquiry(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      // Owners can read/write their own profiles; Admins can manage all.
+      // Pre-registration is allowed for anyone to create their own record.
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(request.resource.data) && (
+        request.resource.data.role == "user" || 
+        (request.resource.data.role == "admin" && request.auth.token.email == "omrishi2580@gmail.com")
+      );
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isValidUser(request.resource.data) && (
+        request.resource.data.role == resource.data.role || isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /about/{aboutId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidId(aboutId);
+    }
+
+    match /socials/{socialId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidId(socialId);
+    }
+  }
+}

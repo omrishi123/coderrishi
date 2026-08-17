@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* 3D perspective setup */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  /* Vibrant Colorful mesh gradient animation */
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .bg-mesh-gradient {
+    background: linear-gradient(-45deg, #ff3366, #ff00cc, #3333ff, #00e5ff, #39ff14);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  /* Glassmorphism glass reflection card style */
+  .glass-card-neon {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 10px 40px -10px rgba(0, 229, 255, 0.25);
+  }
+
+  .dark .glass-card-neon {
+    background: rgba(10, 10, 12, 0.55);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 40px -10px rgba(255, 0, 204, 0.3);
+  }
+
+  /* Smooth spinning rotation helper */
+  .animate-spin-slow {
+    animation: spin 12s linear infinite;
+  }
+}

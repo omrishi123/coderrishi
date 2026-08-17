@@ -1,0 +1,126 @@
+{
+  "entities": {
+    "project": {
+      "title": "Project",
+      "description": "A showcase project in the portfolio",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "The title of the project"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Detailed description of the project"
+        },
+        "techStack": {
+          "type": "array",
+          "description": "Technologies used in the project"
+        },
+        "imageUrl": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "URL to the project mockup or preview image"
+        },
+        "githubLink": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Link to the GitHub repository"
+        },
+        "liveLink": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Link to the live deployed project"
+        }
+      },
+      "required": ["title", "description", "techStack", "imageUrl"]
+    },
+    "skill": {
+      "title": "Skill",
+      "description": "A developer skill with proficiency level",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 50,
+          "description": "The name of the skill (e.g. React)"
+        },
+        "category": {
+          "type": "string",
+          "maxLength": 50,
+          "description": "Category of skill (e.g. Frontend, Fullstack, 3D)"
+        },
+        "proficiency": {
+          "type": "number",
+          "description": "Skill proficiency level from 0 to 100"
+        }
+      },
+      "required": ["name", "category", "proficiency"]
+    },
+    "inquiry": {
+      "title": "Inquiry",
+      "description": "Contact form submissions from visitors",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Sender name"
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Sender email"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Sender message content"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The date-time when inquiry was submitted"
+        }
+      },
+      "required": ["name", "email", "message", "timestamp"]
+    },
+    "user": {
+      "title": "User",
+      "description": "User profile with role details",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "User email address"
+        },
+        "role": {
+          "type": "string",
+          "maxLength": 20,
+          "description": "The user access role (e.g. admin)"
+        }
+      },
+      "required": ["email", "role"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/project" },
+      "description": "Collection of projects showcased in the portfolio"
+    },
+    "/skills/{skillId}": {
+      "schema": { "$ref": "#/entities/skill" },
+      "description": "Collection of developer skills"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/inquiry" },
+      "description": "Visitor contact form messages"
+    },
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/user" },
+      "description": "User profile documents with role assignments"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Coder Rishi Portfolio",
+  "description": "An ultra-premium, high-performance 3D developer portfolio website for Om Rishai (Coder Rishi).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
